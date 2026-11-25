@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block title %}{{ deck.title }}{% endblock %}
+{% block content %}
+<h1>{{ deck.title }}</h1>
+<p>{{ deck.description }}</p>
+<ul class="meta">
+  <li>{{ cards|length }} cards</li>
+</ul>
+
+{% if user.is_authenticated %}
+  <a class="button" href="{% url 'deck-study' deck.slug %}">Study this deck</a>
+{% else %}
+  <p><a class="button" href="{% url 'login' %}?next={{ deck.get_absolute_url }}">Log in to study</a></p>
+{% endif %}
+
+<h2>Cards</h2>
+<p class="muted">Click a card to flip it.</p>
+<div class="flip-grid">
+  {% for card in cards %}
+    <div class="flip-card" tabindex="0" onclick="this.classList.toggle('flipped')"
+         onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.classList.toggle('flipped');}">
+      <div class="flip-inner">
+        <div class="flip-face flip-front"><strong>{{ card.term }}</strong></div>
+        <div class="flip-face flip-back">{{ card.definition }}</div>
+      </div>
+    </div>
+  {% empty %}
+    <p>No cards yet.</p>
+  {% endfor %}
+</div>
+
+{% if results %}
+  <h2>Your recent sessions</h2>
+  <table class="table">
+    <thead><tr><th>Date</th><th>Known</th><th>Score</th></tr></thead>
+    <tbody>
+      {% for r in results %}
+        <tr>
+          <td>{{ r.created_at|date:"Y-m-d H:i" }}</td>
+          <td>{{ r.known_count }}/{{ r.total }}</td>
+          <td>{% if r.passed %}<span class="chip ok">{{ r.percentage }}%</span>{% else %}<span class="chip bad">{{ r.percentage }}%</span>{% endif %}</td>
+        </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% endif %}
+{% endblock %}

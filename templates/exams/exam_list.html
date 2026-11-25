@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}Exams{% endblock %}
+{% block content %}
+<h1>Available exams</h1>
+{% if not entries %}
+  <p>No exams published yet.</p>
+{% endif %}
+<div class="cards">
+  {% for entry in entries %}
+    <article class="card">
+      <h2><a href="{% url 'exam-start' entry.exam.slug %}">{{ entry.exam.title }}</a></h2>
+      <p class="muted">{{ entry.exam.description|truncatewords:30 }}</p>
+      <ul class="meta">
+        <li>{{ entry.question_count }} questions</li>
+        <li>{{ entry.total_points }} points</li>
+        {% if entry.exam.duration_minutes %}
+          <li>{{ entry.exam.duration_minutes }} min</li>
+        {% else %}
+          <li>no time limit</li>
+        {% endif %}
+      </ul>
+      {% if entry.last_attempt %}
+        <p class="badge {% if entry.last_attempt.passed %}ok{% else %}bad{% endif %}">
+          Last result: {{ entry.last_attempt.percentage }}%
+          {% if entry.last_attempt.is_completed %}
+            ({{ entry.last_attempt.score }}/{{ entry.last_attempt.max_score }})
+          {% else %}— in progress{% endif %}
+        </p>
+      {% endif %}
+    </article>
+  {% endfor %}
+</div>
+{% endblock %}

@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}Study: {{ deck.title }}{% endblock %}
+{% block content %}
+<h1>{{ deck.title }}</h1>
+
+<div class="progress">
+  <div class="progress-text">
+    Card {{ position }} of {{ total }}
+    <span class="progress-marks">✓ {{ known_so_far }} · ✗ {{ missed_so_far }}</span>
+  </div>
+  <div class="progress-bar"><span style="width: {% widthratio position total 100 %}%"></span></div>
+</div>
+
+<div class="flip-card study" id="study-card" tabindex="0"
+     onclick="this.classList.toggle('flipped')"
+     onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.classList.toggle('flipped');}">
+  <div class="flip-inner">
+    <div class="flip-face flip-front"><strong>{{ card.term }}</strong></div>
+    <div class="flip-face flip-back">{{ card.definition }}</div>
+  </div>
+</div>
+
+<p class="muted center">Click the card (or press Space) to flip it, then rate yourself.</p>
+
+<form method="post" action="{% url 'deck-mark' deck.slug %}" class="study-actions">
+  {% csrf_token %}
+  <button type="submit" name="mark" value="known" class="button ok">I knew it</button>
+  <button type="submit" name="mark" value="missed" class="button bad">Missed it</button>
+</form>
+{% endblock %}

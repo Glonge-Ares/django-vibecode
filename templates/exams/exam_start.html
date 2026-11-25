@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}{{ exam.title }}{% endblock %}
+{% block content %}
+<h1>{{ exam.title }}</h1>
+<p>{{ exam.description }}</p>
+<ul class="meta">
+  <li>{{ questions|length }} questions</li>
+  <li>{{ total_points }} points</li>
+  {% if exam.duration_minutes %}
+    <li>time limit: {{ exam.duration_minutes }} minutes</li>
+  {% else %}
+    <li>no time limit</li>
+  {% endif %}
+</ul>
+
+{% if user.is_authenticated %}
+  <a class="button" href="{% url 'take-exam' exam.slug %}">
+    {% if in_progress %}Resume exam{% else %}Start exam{% endif %}
+  </a>
+{% else %}
+  <p><a class="button" href="{% url 'login' %}?next={{ exam.get_absolute_url }}">Log in to start</a></p>
+{% endif %}
+{% endblock %}

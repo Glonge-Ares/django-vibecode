@@ -1,0 +1,11 @@
+.git
+.gitignore
+.venv-mcp
+**/__pycache__
+**/*.pyc
+**/*.pyo
+staticfiles
+.env
+.opencode
+AGENTS.md
+README.md

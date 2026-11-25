@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block title %}Take: {{ exam.title }}{% endblock %}
+{% block content %}
+<h1>{{ exam.title }}</h1>
+
+{% if remaining is not None %}
+  <p class="timer" id="timer" data-remaining="{{ remaining }}">Time left: <span id="timer-text">--:--</span></p>
+{% endif %}
+
+<form method="post" action="{% url 'submit-exam' exam.slug %}" id="exam-form">
+  {% csrf_token %}
+  {% for question in questions %}
+    <fieldset class="question">
+      <legend>
+        Q{{ forloop.counter }} · {{ question.get_kind_display }} · {{ question.points }} pt
+      </legend>
+      <p>{{ question.text }}</p>
+
+      {% if question.kind == "text" %}
+        <input type="text" name="q{{ question.pk }}" maxlength="300" autocomplete="off"
+               placeholder="Your answer" required>
+      {% else %}
+        {% for choice in question.choices.all %}
+          <label class="choice">
+            {% if question.kind == "single" %}
+              <input type="radio" name="q{{ question.pk }}" value="{{ choice.pk }}" required>
+            {% else %}
+              <input type="checkbox" name="q{{ question.pk }}" value="{{ choice.pk }}">
+            {% endif %}
+            <span>{{ choice.text }}</span>
+          </label>
+        {% endfor %}
+      {% endif %}
+    </fieldset>
+  {% endfor %}
+
+  <button type="submit" class="button">Submit answers</button>
+</form>
+
+{% if remaining is not None %}
+<script>
+(function () {
+  var remaining = parseInt(document.getElementById("timer").dataset.remaining, 10);
+  var text = document.getElementById("timer-text");
+  var form = document.getElementById("exam-form");
+  function render() {
+    var m = Math.floor(remaining / 60), s = remaining % 60;
+    text.textContent = m + ":" + (s < 10 ? "0" : "") + s;
+    if (remaining <= 0) {
+      clearInterval(timer);
+      alert("Time is up — submitting your answers.");
+      form.submit();
+      return;
+    }
+    remaining -= 1;
+  }
+  var timer = setInterval(render, 1000);
+  render();
+})();
+</script>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}Result: {{ exam.title }}{% endblock %}
+{% block content %}
+<h1>Result: {{ exam.title }}</h1>
+
+<div class="result-summary {% if attempt.passed %}ok{% else %}bad{% endif %}">
+  <strong>{{ attempt.score }} / {{ attempt.max_score }}</strong>
+  ({{ attempt.percentage }}%)
+  {% if attempt.passed %}— passed{% else %}— not passed{% endif %}
+  {% if attempt.expired %}<br><em>Graded after the time limit expired.</em>{% endif %}
+  <br><small>Completed {{ attempt.completed_at|date:"Y-m-d H:i" }}</small>
+</div>
+
+{% for answer in answers %}
+  <fieldset class="question {% if answer.is_correct %}ok{% else %}bad{% endif %}">
+    <legend>Q{{ forloop.counter }} ·
+      {% if answer.is_correct %}correct{% else %}incorrect{% endif %}
+      · {{ answer.question.points }} pt
+    </legend>
+    <p>{{ answer.question.text }}</p>
+
+    {% if answer.question.kind == "text" %}
+      <p>Your answer: <code>{{ answer.text_answer|default:"—" }}</code></p>
+      {% if not answer.is_correct %}
+        <p>Expected: <code>{{ answer.question.expected_text }}</code></p>
+      {% endif %}
+    {% else %}
+      <p>Your answer:
+        {% for c in answer.selected_choices.all %}<span class="chip">{{ c.text }}</span>{% empty %}<em>none</em>{% endfor %}
+      </p>
+      {% if not answer.is_correct %}
+        <p>Correct answer:
+          {% for c in answer.question.choices.all %}{% if c.is_correct %}<span class="chip ok">{{ c.text }}</span>{% endif %}{% endfor %}
+        </p>
+      {% endif %}
+    {% endif %}
+  </fieldset>
+{% endfor %}
+
+<a class="button" href="{% url 'exam-list' %}">Back to exams</a>
+<a class="button" href="{% url 'take-exam' exam.slug %}">Try again</a>
+{% endblock %}

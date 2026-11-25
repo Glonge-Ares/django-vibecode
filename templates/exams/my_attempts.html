@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}My attempts{% endblock %}
+{% block content %}
+<h1>My attempts</h1>
+{% if not attempts %}
+  <p>You have not taken any exam yet. <a href="{% url 'exam-list' %}">Pick an exam</a>.</p>
+{% else %}
+<table class="table">
+  <thead>
+    <tr><th>Exam</th><th>Started</th><th>Completed</th><th>Score</th><th>Status</th><th></th></tr>
+  </thead>
+  <tbody>
+    {% for attempt in attempts %}
+      <tr>
+        <td>{{ attempt.exam.title }}</td>
+        <td>{{ attempt.started_at|date:"Y-m-d H:i" }}</td>
+        <td>{{ attempt.completed_at|date:"Y-m-d H:i"|default:"—" }}</td>
+        <td>{% if attempt.is_completed %}{{ attempt.score }}/{{ attempt.max_score }} ({{ attempt.percentage }}%){% else %}—{% endif %}</td>
+        <td>
+          {% if not attempt.is_completed %}in progress
+          {% elif attempt.passed %}<span class="chip ok">passed</span>
+          {% else %}<span class="chip bad">not passed</span>{% endif %}
+        </td>
+        <td>
+          {% if attempt.is_completed %}
+            <a href="{% url 'exam-result' attempt.pk %}">details</a>
+          {% else %}
+            <a href="{% url 'take-exam' attempt.exam.slug %}">resume</a>
+          {% endif %}
+        </td>
+      </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endif %}
+{% endblock %}

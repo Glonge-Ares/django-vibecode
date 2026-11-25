@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}Flashcards{% endblock %}
+{% block content %}
+<h1>Flashcard decks</h1>
+{% if not entries %}
+  <p>No decks published yet.</p>
+{% endif %}
+<div class="cards">
+  {% for entry in entries %}
+    <article class="card">
+      <h2><a href="{% url 'deck-detail' entry.deck.slug %}">{{ entry.deck.title }}</a></h2>
+      <p class="muted">{{ entry.deck.description|truncatewords:30 }}</p>
+      <ul class="meta">
+        <li>{{ entry.card_count }} cards</li>
+      </ul>
+      {% if entry.last_result %}
+        <p class="badge {% if entry.last_result.passed %}ok{% else %}bad{% endif %}">
+          Last session: {{ entry.last_result.known_count }}/{{ entry.last_result.total }}
+          ({{ entry.last_result.percentage }}%)
+        </p>
+      {% endif %}
+    </article>
+  {% endfor %}
+</div>
+{% endblock %}

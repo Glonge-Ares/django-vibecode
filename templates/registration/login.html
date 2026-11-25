@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}Log in{% endblock %}
+{% block content %}
+<h1>Log in</h1>
+<form method="post" class="form">
+  {% csrf_token %}
+  {% if form.non_field_errors %}
+    <p class="msg error">{{ form.non_field_errors }}</p>
+  {% endif %}
+  <label>Username
+    <input type="text" name="username" autofocus required
+           value="{{ form.username.value|default_if_none:'' }}">
+  </label>
+  <label>Password
+    <input type="password" name="password" required>
+  </label>
+  <button type="submit" class="button">Log in</button>
+  <input type="hidden" name="next" value="{{ next }}">
+</form>
+<p class="muted">No account yet? <a href="{% url 'register' %}">Create one</a> — e-mail confirmation is not required.</p>
+{% endblock %}

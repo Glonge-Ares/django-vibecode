@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %}Create an account{% endblock %}
+{% block content %}
+<h1>Create an account</h1>
+<p class="muted">No e-mail confirmation is required — just pick a username,
+an e-mail address and a password.</p>
+
+<form method="post" class="form">
+  {% csrf_token %}
+  {% if form.non_field_errors %}
+    <p class="msg error">{{ form.non_field_errors }}</p>
+  {% endif %}
+  {% for field in form %}
+    <label>{{ field.label }} {{ field }}</label>
+    {% if field.help_text %}
+      <div class="muted small">{{ field.help_text|safe }}</div>
+    {% endif %}
+    {% if field.errors %}
+      <p class="msg error">{{ field.errors }}</p>
+    {% endif %}
+  {% endfor %}
+  <button type="submit" class="button">Register</button>
+</form>
+
+<p class="muted">Already have an account? <a href="{% url 'login' %}">Log in</a></p>
+{% endblock %}
